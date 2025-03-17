@@ -36,17 +36,8 @@ public class SaleService {
 	@Transactional(readOnly = true)
 	public Page<ReportDTO> findToReport(String minDateParam, String maxDateParam, String nameParam, Pageable pageable) {
 
-		LocalDate datahoje = LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault());
-
-		LocalDate minDate = datahoje.minusYears(1L);
-		if(minDateParam!=null && !minDateParam.trim().isEmpty()) {
-			minDate = LocalDate.parse(minDateParam);
-		}
-
-		LocalDate maxDate = datahoje;
-		if(maxDateParam!=null && !maxDateParam.trim().isEmpty()) {
-			maxDate = LocalDate.parse(maxDateParam);
-		}
+		LocalDate maxDate = consisteMaxDate(maxDateParam);
+		LocalDate minDate = consisteMinDate(minDateParam, maxDate);
 
 		Page<ReportDTO> listaReportDTO = saleRepository.findToReport(minDate, maxDate, nameParam, pageable);
 
@@ -56,20 +47,33 @@ public class SaleService {
 	@Transactional(readOnly = true)
 	public List<SummaryDTO> findToSummary(String minDateParam, String maxDateParam) {
 
-		LocalDate datahoje = LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault());
+		LocalDate maxDate = consisteMaxDate(maxDateParam);
+		LocalDate minDate = consisteMinDate(minDateParam, maxDate);
 
-		LocalDate minDate = datahoje.minusYears(1L);
-		if(minDateParam!=null && !minDateParam.trim().isEmpty()) {
-			minDate = LocalDate.parse(minDateParam);
-		}
+		List<SummaryDTO> listaSummaryDTO = saleRepository.findToSummary(minDate, maxDate);
+
+		return listaSummaryDTO;
+	}
+
+	private LocalDate consisteMaxDate(String maxDateParam) {
+
+		LocalDate datahoje = LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault());
 
 		LocalDate maxDate = datahoje;
 		if(maxDateParam!=null && !maxDateParam.trim().isEmpty()) {
 			maxDate = LocalDate.parse(maxDateParam);
 		}
 
-		List<SummaryDTO> listaSummaryDTO = saleRepository.findToSummary(minDate, maxDate);
+		return maxDate;
+	}
 
-		return listaSummaryDTO;
+	private LocalDate consisteMinDate(String minDateParam, LocalDate maxDate) {
+
+		LocalDate minDate = maxDate.minusYears(1L);
+		if(minDateParam!=null && !minDateParam.trim().isEmpty()) {
+			minDate = LocalDate.parse(minDateParam);
+		}
+
+		return minDate;
 	}
 }
