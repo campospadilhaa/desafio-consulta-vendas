@@ -9,7 +9,7 @@ public class ReportDTO {
 	private Double amount;
 	private String sellerName;
 	
-	public ReportDTO(Long id, Double amount, LocalDate date, String sellerName) {
+	public ReportDTO(Long id, LocalDate date, Double amount, String sellerName) {
 
 		this.id = id;
 		this.amount = amount;
