@@ -1,5 +1,6 @@
 package com.devsuperior.dsmeta.services;
 
+import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -17,6 +18,7 @@ import com.devsuperior.dsmeta.dto.SaleMinDTO;
 import com.devsuperior.dsmeta.dto.SummaryDTO;
 import com.devsuperior.dsmeta.entities.Sale;
 import com.devsuperior.dsmeta.repositories.SaleRepository;
+import com.devsuperior.dsmeta.services.exceptions.ResourceNotFoundException;
 
 @Service
 public class SaleService {
@@ -57,23 +59,33 @@ public class SaleService {
 
 	private LocalDate consisteMaxDate(String maxDateParam) {
 
-		LocalDate datahoje = LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault());
+		try {
 
-		LocalDate maxDate = datahoje;
-		if(maxDateParam!=null && !maxDateParam.trim().isEmpty()) {
-			maxDate = LocalDate.parse(maxDateParam);
+			LocalDate datahoje = LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault());
+
+			LocalDate maxDate = datahoje;
+			if(maxDateParam!=null && !maxDateParam.trim().isEmpty()) {
+				maxDate = LocalDate.parse(maxDateParam);
+			}
+
+			return maxDate;
+
+		} catch (DateTimeException e) {
+			throw new ResourceNotFoundException("Data inválida para: 'maxDate'");
 		}
-
-		return maxDate;
 	}
 
 	private LocalDate consisteMinDate(String minDateParam, LocalDate maxDate) {
 
-		LocalDate minDate = maxDate.minusYears(1L);
-		if(minDateParam!=null && !minDateParam.trim().isEmpty()) {
-			minDate = LocalDate.parse(minDateParam);
-		}
+		try {
+			LocalDate minDate = maxDate.minusYears(1L);
+			if (minDateParam != null && !minDateParam.trim().isEmpty()) {
+				minDate = LocalDate.parse(minDateParam);
+			}
 
-		return minDate;
+			return minDate;
+		} catch (DateTimeException e) {
+			throw new ResourceNotFoundException("Data inválida para: 'minDate'");
+		}
 	}
 }
